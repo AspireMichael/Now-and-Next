@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aspire Now and Next</title>
+    <!-- Favicon using the Aspire powered logo -->
+    <link rel="icon" type="image/png" href="32x32.png" />
+    <style>
+      /* Reset some defaults */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+/* Splash */
+#splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.4s ease;
+}
+
+#splash-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#splash-overlay img {
+  max-width: 340px;
+  width: 55%;
+  height: auto;
+}
+
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 1rem;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+      }
+
+      header nav button {
+        margin-right: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #e0e0e0;
+      }
+
+      header nav button.active {
+        background-color: #0078d4;
+        color: #fff;
+      }
+
+      main {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+
+      /* Planner styles */
+      .planner-section {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .layout-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: flex-end;
+        margin-bottom: 0.5rem;
+      }
+
+      .day-selector,
+      .colour-scheme,
+      .theme-select,
+      .compact-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .day-selector select,
+      .colour-scheme select,
+      .theme-select select {
+        padding: 0.4rem;
+        font-size: 0.95rem;
+      }
+
+      .compact-toggle label {
+        font-size: 0.9rem;
+      }
+
+      .compact-toggle input {
+        margin-right: 0.25rem;
+      }
+
+      .block-list {
+        margin-top: 1rem;
+      }
+
+      .block-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .block-icon {
+        font-size: 1rem;
+        margin-right: 0.5rem;
+      }
+
+      .block-item span.label {
+        flex: 1;
+      }
+
+      .block-item small {
+        margin-left: 0.5rem;
+        color: #555;
+      }
+
+      .block-item button {
+        margin-left: 0.3rem;
+        padding: 0.3rem 0.6rem;
+        border: none;
+        background: #f0f0f0;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+
+      .block-item button:hover {
+        background: #e0e0e0;
+      }
+
+      .add-block-form {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .add-block-form input[type='text'] {
+        flex: 1;
+        padding: 0.4rem;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+
+      .add-block-form select {
+        padding: 0.4rem;
+      }
+
+      .add-block-form button {
+        padding: 0.4rem 1rem;
+        border: none;
+        border-radius: 3px;
+        background: #0078d4;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .add-block-form button:hover {
+        background: #005fa3;
+      }
+
+      .planner-controls {
+        margin-top: 1rem;
+      }
+
+      .planner-controls button {
+        margin-right: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .planner-controls button.primary {
+        background: #0078d4;
+        color: #fff;
+      }
+
+      .planner-controls button.danger {
+        background: #d9473a;
+        color: #fff;
+      }
+
+      .powered-by {
+  margin-top: 1.5rem;
+  padding: 0.5rem 0 0.5rem;
+  border-top: 1px solid #cccccc55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.95;
+  font-size: 0.85rem;
+  text-align: center;
+
+  /* new: make this a positioning context */
+  position: relative;
+}
+
+.powered-by img {
+  height: 145px;
+  width: auto;
+  opacity: 0.98;
+  display: block;
+}
+
+/* overlay the text on top of the logo */
+.powered-by span {
+  position: absolute;
+  bottom: 6px;              /* move up/down over the logo */
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 1.1;
+  z-index: 2;
+}
+
+
+
+
+
+      /* Display styles */
+      .display-section {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .display-panel {
+        margin-bottom: 0.75rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        padding: 2rem 1.5rem;
+      }
+
+      #nowPanel {
+        padding: 2.4rem 1.8rem;
+      }
+
+      #nextPanel {
+        padding: 1.4rem 1.2rem;
+      }
+
+      .display-panel h2 {
+        margin-bottom: 0.75rem;
+      }
+
+      .display-panel p {
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .display-icon {
+        font-size: 1.4rem;
+        margin-right: 0.5rem;
+      }
+
+      .now-next-arrow {
+        text-align: center;
+        margin: 0.3rem 0 0.8rem;
+        font-size: 1.6rem;
+        opacity: 0.6;
+      }
+
+      .display-controls button {
+        padding: 0.6rem 1.2rem;
+        margin: 0.3rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background: #0078d4;
+        color: #fff;
+      }
+
+      .display-controls button:hover {
+        background: #005fa3;
+      }
+
+      .display-controls button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* ---------- THEMES & COMPACT MODE ---------- */
+
+      body[data-theme='soft'] .display-panel {
+        border-radius: 18px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+      }
+
+      body[data-theme='bold'] .display-panel h2 {
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      body[data-theme='bold'] header h1 {
+        font-weight: bold;
+      }
+
+      body.compact-mode header {
+        padding: 0.6rem 0.75rem;
+      }
+
+      body.compact-mode .planner-section,
+      body.compact-mode .display-section {
+        max-width: 520px;
+      }
+
+      body.compact-mode main {
+        padding: 0.5rem;
+      }
+
+      body.compact-mode #nowPanel {
+        padding: 1.4rem 1.1rem;
+      }
+
+      body.compact-mode #nextPanel {
+        padding: 1rem 0.8rem;
+      }
+
+      body.compact-mode .display-panel p {
+        font-size: 1.15rem;
+      }
+
+      body.compact-mode .block-item {
+        padding: 0.4rem;
+      }
+
+      body.compact-mode .add-block-form input[type='text'] {
+        padding: 0.3rem;
+      }
+
+      /* ---------- RESPONSIVE TWEAKS FOR SMALL WINDOWS ---------- */
+
+      @media (max-width: 800px), (max-height: 550px) {
+        main {
+          padding: 0.5rem;
+        }
+
+        .display-section {
+          max-width: 100%;
+        }
+
+        #nowPanel {
+          padding: 1.6rem 1rem;
+        }
+
+        #nextPanel {
+          padding: 1rem 0.8rem;
+        }
+
+        .display-panel p {
+          font-size: 1.2rem;
+        }
+      }
+
+      @media (max-width: 600px), (max-height: 450px) {
+        header {
+          padding: 0.4rem 0.6rem;
+        }
+
+        header h1 {
+          font-size: 0.9rem;
+          line-height: 1.1;
+        }
+
+        header nav button {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.8rem;
+        }
+
+        main {
+          padding: 0.3rem;
+        }
+
+        .display-section {
+          max-width: 100%;
+          padding: 0.2rem;
+        }
+
+        #nowPanel {
+          padding: 0.9rem 0.6rem;
+        }
+
+        #nextPanel {
+          padding: 0.6rem 0.5rem;
+        }
+
+        .display-panel p {
+          font-size: 0.95rem;
+        }
+      }
+
+      @media (max-width: 500px), (max-height: 380px) {
+        header {
+          padding: 0.2rem 0.4rem;
+        }
+
+        header h1 {
+          font-size: 0.8rem;
+        }
+
+        header nav button {
+          padding: 0.25rem 0.5rem;
+          font-size: 0.75rem;
+        }
+
+        main {
+          padding: 0.2rem;
+        }
+
+        #nowPanel {
+          padding: 0.7rem 0.5rem;
+        }
+
+        #nextPanel {
+          padding: 0.5rem 0.4rem;
+        }
+
+        .display-panel p {
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SPLASH SCREEN -->
+<div id="splash-overlay">
+  <img src="splash.png" alt="Aspire Inclusion Technologies" />
+</div>
+
+    <header>
+      <h1>Aspire Now and Next</h1>
+      <nav>
+        <button id="plannerTab" class="active">Planner</button>
+        <button id="displayTab">Display</button>
+      </nav>
+    </header>
+    <main>
+      <!-- Planner View -->
+      <section id="plannerView" class="planner-section">
+        <div class="layout-row">
+          <div class="day-selector">
+            <label for="daySelect">Day:</label>
+            <select id="daySelect"></select>
+          </div>
+          <div class="colour-scheme">
+            <label for="colourSelect">Colour scheme:</label>
+            <select id="colourSelect"></select>
+          </div>
+          <div class="theme-select">
+            <label for="themeSelect">Theme:</label>
+            <select id="themeSelect">
+              <option value="standard">Standard</option>
+              <option value="soft">Soft rounded</option>
+              <option value="bold">Bold headings</option>
+            </select>
+          </div>
+          <div class="compact-toggle">
+            <label>
+              <input type="checkbox" id="compactToggle" />
+              Compact mode
+            </label>
+          </div>
+        </div>
+
+        <div class="block-list" id="blockList"></div>
+
+        <form id="addBlockForm" class="add-block-form" onsubmit="return false;">
+          <input type="text" id="newBlockLabel" placeholder="Block label" required />
+          <select id="newBlockType">
+            <option value="registration">Registration</option>
+            <option value="lesson" selected>Lesson</option>
+            <option value="break">Break</option>
+            <option value="movement">Movement break</option>
+            <option value="lunch">Lunch</option>
+            <option value="reward">Reward time</option>
+            <option value="end of the day">End of the Day</option>
+            <option value="other">Other</option>
+          </select>
+          <button type="submit">Add</button>
+        </form>
+
+        <div class="planner-controls">
+          <button id="resetDayBtn" class="danger">Reset Day</button>
+          <button id="goDisplayBtn" class="primary">Go to Display</button>
+        </div>
+
+        <div class="powered-by">
+          <img
+            src="aspire-powered.png"
+            alt="Aspire Inclusion Technologies"
+          />
+          <span>Powered by Aspire Inclusion Technologies</span>
+        </div>
+      </section>
+
+      <!-- Display View -->
+      <section id="displayView" class="display-section hidden">
+        <div id="nowPanel" class="display-panel">
+          <h2>Now</h2>
+          <p>
+            <span id="nowIcon" class="display-icon"></span>
+            <span id="nowLabel">No activity set</span>
+          </p>
+        </div>
+
+        <div class="now-next-arrow">↓</div>
+
+        <div id="nextPanel" class="display-panel">
+          <h2>Next</h2>
+          <p>
+            <span id="nextIcon" class="display-icon"></span>
+            <span id="nextLabel">No activity set</span>
+          </p>
+        </div>
+
+        <div class="display-controls">
+          <button id="prevBtn">← Back</button>
+          <button id="advanceBtn">Next →</button>
+          <button id="resetDisplayBtn">Reset</button>
+        </div>
+      </section>
+    </main>
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const splash = document.getElementById("splash-overlay");
+    setTimeout(() => splash.classList.add("hidden"), 1000);
+  });
+</script>
+
+    <script>
+      (function () {
+        const COLOUR_SCHEMES = {
+          calmBlue: {
+            name: 'Calm Blue',
+            background: '#e8f1fb',
+            now: '#005EB8',
+            next: '#7DA7D9',
+            text: '#ffffff',
+          },
+          softGreen: {
+            name: 'Soft Green',
+            background: '#e8f7f1',
+            now: '#2E7D32',
+            next: '#66BB6A',
+            text: '#ffffff',
+          },
+          highContrast: {
+            name: 'High Contrast',
+            background: '#ffffff',
+            now: '#000000',
+            next: '#333333',
+            text: '#ffffff',
+          },
+          warm: {
+            name: 'Warm',
+            background: '#FFF3E0',
+            now: '#FB8C00',
+            next: '#FFB74D',
+            text: '#ffffff',
+          },
+          dyslexia: {
+            name: 'Dyslexia Friendly',
+            background: '#F5F5F5',
+            now: '#102C57',
+            next: '#7A9CC6',
+            text: '#ffffff',
+          },
+        };
+
+        const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+        let state = {
+          weekSchedule: {},
+          settings: {
+            colourScheme: 'calmBlue',
+            currentDay: 'monday',
+            currentIndexByDay: {},
+            theme: 'standard',
+            compactMode: false,
+          },
+        };
+
+        function getTypeIcon(type) {
+          switch (type) {
+            case 'registration':
+              return '📝';
+            case 'lesson':
+              return '📘';
+            case 'break':
+              return '🌤️';
+            case 'movement':
+              return '🤸';
+            case 'lunch':
+              return '🍽️';
+            case 'reward':
+              return '⭐';
+            case 'end of the day':
+              return '🏠';
+            default:
+              return '⬜';
+          }
+        }
+
+        function saveState() {
+          localStorage.setItem('aspire-now-next', JSON.stringify(state));
+        }
+
+        function loadState() {
+          const saved = localStorage.getItem('aspire-now-next');
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              if (parsed.weekSchedule && parsed.settings) {
+                state = parsed;
+                if (!state.settings.theme) state.settings.theme = 'standard';
+                if (typeof state.settings.compactMode !== 'boolean') {
+                  state.settings.compactMode = false;
+                }
+              }
+            } catch (e) {
+              console.error('Failed to parse saved state', e);
+            }
+          }
+        }
+
+        function getTodayKey() {
+          const day = new Date().getDay();
+          const map = {
+            0: null,
+            1: 'monday',
+            2: 'tuesday',
+            3: 'wednesday',
+            4: 'thursday',
+            5: 'friday',
+            6: null,
+          };
+          return map[day] || 'monday';
+        }
+
+        function ensureDefaultSchedule() {
+          DAYS.forEach((day) => {
+            if (!state.weekSchedule[day]) {
+              state.weekSchedule[day] = [
+                {
+                  id: crypto.randomUUID(),
+                  label: 'Registration',
+                  type: 'registration',
+                },
+              ];
+            }
+          });
+        }
+
+        const plannerTabBtn = document.getElementById('plannerTab');
+        const displayTabBtn = document.getElementById('displayTab');
+        const plannerView = document.getElementById('plannerView');
+        const displayView = document.getElementById('displayView');
+        const daySelect = document.getElementById('daySelect');
+        const colourSelect = document.getElementById('colourSelect');
+        const themeSelect = document.getElementById('themeSelect');
+        const compactToggle = document.getElementById('compactToggle');
+        const blockList = document.getElementById('blockList');
+        const addBlockForm = document.getElementById('addBlockForm');
+        const newBlockLabel = document.getElementById('newBlockLabel');
+        const newBlockType = document.getElementById('newBlockType');
+        const resetDayBtn = document.getElementById('resetDayBtn');
+        const goDisplayBtn = document.getElementById('goDisplayBtn');
+
+        const nowPanel = document.getElementById('nowPanel');
+        const nextPanel = document.getElementById('nextPanel');
+        const nowLabel = document.getElementById('nowLabel');
+        const nextLabel = document.getElementById('nextLabel');
+        const nowIcon = document.getElementById('nowIcon');
+        const nextIcon = document.getElementById('nextIcon');
+        const advanceBtn = document.getElementById('advanceBtn');
+        const resetDisplayBtn = document.getElementById('resetDisplayBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        function renderDaySelect() {
+          daySelect.innerHTML = '';
+          DAYS.forEach((day) => {
+            const opt = document.createElement('option');
+            opt.value = day;
+            opt.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            if (state.settings.currentDay === day) opt.selected = true;
+            daySelect.appendChild(opt);
+          });
+        }
+
+        function renderColourSelect() {
+          colourSelect.innerHTML = '';
+          Object.keys(COLOUR_SCHEMES).forEach((key) => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = COLOUR_SCHEMES[key].name;
+            if (state.settings.colourScheme === key) opt.selected = true;
+            colourSelect.appendChild(opt);
+          });
+        }
+
+        function renderThemeControls() {
+          themeSelect.value = state.settings.theme || 'standard';
+          compactToggle.checked = !!state.settings.compactMode;
+        }
+
+        function applyThemeAndCompact() {
+          const scheme = COLOUR_SCHEMES[state.settings.colourScheme];
+          if (scheme) {
+            displayView.style.backgroundColor = scheme.background;
+            nowPanel.style.backgroundColor = scheme.now;
+            nowPanel.style.color = scheme.text;
+            nextPanel.style.backgroundColor = scheme.next;
+            nextPanel.style.color = scheme.text;
+          }
+
+          document.body.dataset.theme = state.settings.theme || 'standard';
+
+          if (state.settings.compactMode) {
+            document.body.classList.add('compact-mode');
+          } else {
+            document.body.classList.remove('compact-mode');
+          }
+        }
+
+        function renderBlockList() {
+          const day = state.settings.currentDay;
+          const blocks = state.weekSchedule[day] || [];
+          blockList.innerHTML = '';
+          if (blocks.length === 0) {
+            const p = document.createElement('p');
+            p.textContent = 'No blocks. Add one below.';
+            blockList.appendChild(p);
+          } else {
+            blocks.forEach((blk, index) => {
+              const div = document.createElement('div');
+              div.className = 'block-item';
+
+              const iconSpan = document.createElement('span');
+              iconSpan.className = 'block-icon';
+              iconSpan.textContent = getTypeIcon(blk.type);
+              div.appendChild(iconSpan);
+
+              const labelSpan = document.createElement('span');
+              labelSpan.className = 'label';
+              labelSpan.textContent = blk.label;
+              div.appendChild(labelSpan);
+
+              const typeSmall = document.createElement('small');
+              typeSmall.textContent = '(' + blk.type + ')';
+              div.appendChild(typeSmall);
+
+              const upBtn = document.createElement('button');
+              upBtn.textContent = '↑';
+              upBtn.title = 'Move up';
+              upBtn.disabled = index === 0;
+              upBtn.addEventListener('click', () => moveBlock(index, -1));
+              div.appendChild(upBtn);
+
+              const downBtn = document.createElement('button');
+              downBtn.textContent = '↓';
+              downBtn.title = 'Move down';
+              downBtn.disabled = index === blocks.length - 1;
+              downBtn.addEventListener('click', () => moveBlock(index, 1));
+              div.appendChild(downBtn);
+
+              const delBtn = document.createElement('button');
+              delBtn.textContent = '✕';
+              delBtn.title = 'Delete';
+              delBtn.addEventListener('click', () => deleteBlock(index));
+              div.appendChild(delBtn);
+
+              blockList.appendChild(div);
+            });
+          }
+        }
+
+        function moveBlock(index, direction) {
+          const day = state.settings.currentDay;
+          const blocks = state.weekSchedule[day];
+          const targetIndex = index + direction;
+          if (targetIndex < 0 || targetIndex >= blocks.length) return;
+          const temp = blocks[index];
+          blocks[index] = blocks[targetIndex];
+          blocks[targetIndex] = temp;
+          saveState();
+          renderBlockList();
+          updateDisplayPanels();
+        }
+
+        function deleteBlock(index) {
+          const day = state.settings.currentDay;
+          state.weekSchedule[day].splice(index, 1);
+          const currentIndex = state.settings.currentIndexByDay[day] || 0;
+          if (currentIndex > index) {
+            state.settings.currentIndexByDay[day] = currentIndex - 1;
+          } else if (currentIndex >= state.weekSchedule[day].length) {
+            state.settings.currentIndexByDay[day] =
+              state.weekSchedule[day].length - 1;
+          }
+          saveState();
+          renderBlockList();
+          updateDisplayPanels();
+        }
+
+        // Auto-fill label when type changes (Break/Lunch/etc)
+        newBlockType.addEventListener('change', () => {
+          const type = newBlockType.value;
+          const current = newBlockLabel.value.trim();
+          const wasAutofill = newBlockLabel.dataset.autofill === '1';
+
+          if (!current || wasAutofill) {
+            let auto = '';
+            if (type === 'break') auto = 'Breaktime';
+            else if (type === 'lunch') auto = 'Lunchtime';
+            else if (type === 'movement') auto = 'Movement break';
+            else if (type === 'reward') auto = 'Reward time';
+
+            newBlockLabel.value = auto;
+            newBlockLabel.dataset.autofill = auto ? '1' : '';
+          }
+        });
+
+        newBlockLabel.addEventListener('input', () => {
+          newBlockLabel.dataset.autofill = '';
+        });
+
+        addBlockForm.addEventListener('submit', () => {
+          const label = newBlockLabel.value.trim();
+          const type = newBlockType.value;
+          if (!label) return;
+          const day = state.settings.currentDay;
+          state.weekSchedule[day].push({
+            id: crypto.randomUUID(),
+            label,
+            type,
+          });
+          newBlockLabel.value = '';
+          newBlockLabel.dataset.autofill = '';
+          saveState();
+          renderBlockList();
+        });
+
+        daySelect.addEventListener('change', () => {
+          state.settings.currentDay = daySelect.value;
+          saveState();
+          renderBlockList();
+          updateDisplayPanels();
+        });
+
+        colourSelect.addEventListener('change', () => {
+          state.settings.colourScheme = colourSelect.value;
+          saveState();
+          applyThemeAndCompact();
+        });
+
+        themeSelect.addEventListener('change', () => {
+          state.settings.theme = themeSelect.value;
+          saveState();
+          applyThemeAndCompact();
+        });
+
+        compactToggle.addEventListener('change', () => {
+          state.settings.compactMode = compactToggle.checked;
+          saveState();
+          applyThemeAndCompact();
+        });
+
+        resetDayBtn.addEventListener('click', () => {
+          if (
+            !confirm(
+              'Reset day? This will remove all blocks except Registration and reset progress.',
+            )
+          ) {
+            return;
+          }
+          const day = state.settings.currentDay;
+          state.weekSchedule[day] = [
+            {
+              id: crypto.randomUUID(),
+              label: 'Registration',
+              type: 'registration',
+            },
+          ];
+          state.settings.currentIndexByDay[day] = 0;
+          saveState();
+          renderBlockList();
+          updateDisplayPanels();
+        });
+
+        goDisplayBtn.addEventListener('click', () => {
+          showDisplayView();
+        });
+
+        advanceBtn.addEventListener('click', () => {
+          const day = state.settings.currentDay;
+          const blocks = state.weekSchedule[day];
+          const idx = state.settings.currentIndexByDay[day] || 0;
+          if (idx < blocks.length - 1) {
+            state.settings.currentIndexByDay[day] = idx + 1;
+            saveState();
+            updateDisplayPanels();
+          }
+        });
+
+        prevBtn.addEventListener('click', () => {
+          const day = state.settings.currentDay;
+          const idx = state.settings.currentIndexByDay[day] || 0;
+          if (idx > 0) {
+            state.settings.currentIndexByDay[day] = idx - 1;
+            saveState();
+            updateDisplayPanels();
+          }
+        });
+
+        resetDisplayBtn.addEventListener('click', () => {
+          const day = state.settings.currentDay;
+          state.settings.currentIndexByDay[day] = 0;
+          saveState();
+          updateDisplayPanels();
+        });
+
+        plannerTabBtn.addEventListener('click', () => {
+          showPlannerView();
+        });
+
+        displayTabBtn.addEventListener('click', () => {
+          showDisplayView();
+        });
+
+        function showPlannerView() {
+          plannerView.classList.remove('hidden');
+          displayView.classList.add('hidden');
+          plannerTabBtn.classList.add('active');
+          displayTabBtn.classList.remove('active');
+
+          if (window.electronAPI && window.electronAPI.setWindowSize) {
+            window.electronAPI.setWindowSize(1024, 768);
+          }
+        }
+
+        function showDisplayView() {
+          plannerView.classList.add('hidden');
+          displayView.classList.remove('hidden');
+          plannerTabBtn.classList.remove('active');
+          displayTabBtn.classList.add('active');
+          updateDisplayPanels();
+          applyThemeAndCompact();
+
+          if (window.electronAPI && window.electronAPI.setWindowSize) {
+            window.electronAPI.setWindowSize(700, 420);
+          }
+        }
+
+        function updateDisplayPanels() {
+          const day = state.settings.currentDay;
+          const blocks = state.weekSchedule[day] || [];
+          const idx = state.settings.currentIndexByDay[day] || 0;
+          const now = blocks[idx] || null;
+          const next = blocks[idx + 1] || null;
+
+          if (now) {
+            nowLabel.textContent = now.label;
+            nowIcon.textContent = getTypeIcon(now.type);
+          } else {
+            nowLabel.textContent = 'No activity set';
+            nowIcon.textContent = '';
+          }
+
+          if (next) {
+            nextLabel.textContent = next.label;
+            nextIcon.textContent = getTypeIcon(next.type);
+          } else {
+            nextLabel.textContent = 'No activity set';
+            nextIcon.textContent = '';
+          }
+
+          advanceBtn.disabled = !next;
+          prevBtn.disabled = idx <= 0;
+        }
+
+        function init() {
+          loadState();
+          if (!state.settings.currentDay) {
+            state.settings.currentDay = getTodayKey();
+          }
+          ensureDefaultSchedule();
+          renderDaySelect();
+          renderColourSelect();
+          renderThemeControls();
+          applyThemeAndCompact();
+          renderBlockList();
+          updateDisplayPanels();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+      })();
+    </script>
+  </body>
+</html>
